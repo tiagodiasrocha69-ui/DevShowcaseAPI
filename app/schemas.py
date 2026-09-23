@@ -102,3 +102,35 @@ class ProjectResponse(BaseModel):
     profile_id: int
     technologies: list[TechnologyResponse]
     feedbacks: list[FeedbackResponse]
+
+from pydantic import BaseModel, Field
+from typing import Optional, List
+from datetime import datetime
+
+# --- SCHEMAS DE FEEDBACK ---
+class FeedbackCreate(BaseModel):
+    author_name: str = Field(..., max_length=120, description="Nome de quem está avaliando")
+    comment: str = Field(..., description="Comentário sobre o projeto")
+    rating: int = Field(..., ge=1, le=5, description="Nota de 1 a 5")
+
+class FeedbackResponse(FeedbackCreate):
+    id: int
+    project_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# --- ATUALIZAÇÃO DO PROJECT RESPONSE ---
+# Garante que no teu ProjectResponse existente constem os campos abaixo:
+class ProjectResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    repository_url: str
+    upvotes: int = 0
+    average_rating: Optional[float] = 0.0
+    feedbacks: List[FeedbackResponse] = []
+
+    class Config:
+        from_attributes = True
